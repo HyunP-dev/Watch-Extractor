@@ -1,10 +1,29 @@
 #include <stdio.h>
 #include <adwaita.h>
 
-const char* GET_FILE_LIST = "adb -s emulator-5554 shell run-as kr.ac.hallym.watchlogger ls files";
 
-static char** getFiles() {
-    return
+static char *
+execute(char *command) {
+    static char *result = NULL;
+    const int BUFFER_SIZE = 2;
+    char buffer[BUFFER_SIZE];
+    FILE *fp = popen(command, "r");
+    if (fp == NULL) return NULL;
+    int time = 0;
+    while (fgets(buffer, BUFFER_SIZE, fp)) {
+        time++;
+        result = (char *) realloc(result, time * BUFFER_SIZE * sizeof(char));
+        strcat(result, buffer);
+    }
+    return result;
+}
+
+const char *
+        GET_FILE_LIST = "adb -s emulator-5554 shell run-as kr.ac.hallym.watchlogger ls files";
+
+static char **
+getFiles() {
+    return NULL;
 }
 
 static void
@@ -16,6 +35,16 @@ set_margin(GObject *const object, const gint margin) {
                  "margin-bottom", margin,
                  NULL);
 }
+
+void
+button_clicked(GtkWidget *widget, gpointer data)
+{
+    g_print("Button Clicked\n");
+    GtkPaned * paned = (GtkPaned *) data;
+    gtk_paned_set_end_child(paned, NULL);
+}
+
+GtkLabel *noconnected_hint = NULL;
 
 static void
 activate_cb(GtkApplication *app) {
@@ -30,7 +59,7 @@ activate_cb(GtkApplication *app) {
     GtkPaned *paned = (GtkPaned *) gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_window_set_child(GTK_WINDOW (window), (GtkWidget *) paned);
 
-    GtkLabel *label2 = (GtkLabel *) gtk_label_new("기기에 연결되어 있지 않습니다.");
+    noconnected_hint = (GtkLabel *) gtk_label_new("기기에 연결되어 있지 않습니다.");
 
 
     GtkBox *leftBox = (GtkBox *) gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -46,6 +75,10 @@ activate_cb(GtkApplication *app) {
     gtk_box_append(ipBox, (GtkWidget *) ipField);
     GtkButton *btn = (GtkButton *) gtk_button_new();
     gtk_button_set_label(btn, "연결");
+
+    g_signal_connect (G_OBJECT (btn), "clicked",
+                      G_CALLBACK (button_clicked), paned);
+
     gtk_box_append(ipBox, (GtkWidget *) btn);
     gtk_box_append(leftBox, (GtkWidget *) ipBox);
 
@@ -57,7 +90,7 @@ activate_cb(GtkApplication *app) {
     gtk_box_append(leftBox, (GtkWidget *) deviceStatusTxt);
 
     gtk_paned_set_start_child(paned, (GtkWidget *) leftBox);
-    gtk_paned_set_end_child(paned, (GtkWidget *) label2);
+    gtk_paned_set_end_child(paned, (GtkWidget *) noconnected_hint);
 
     gtk_paned_set_position(paned, 240);
 }
@@ -65,6 +98,9 @@ activate_cb(GtkApplication *app) {
 int
 main(int argc,
      char *argv[]) {
+//    char* out1 = execute("ls -la");
+//    char* out2 = execute("ls");
+//    printf("%s", out2);
     g_autoptr (AdwApplication) app = NULL;
 
     app = adw_application_new("org.example.Hello", G_APPLICATION_FLAGS_NONE);

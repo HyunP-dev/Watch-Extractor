@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(Watch_Extractor C)
 
 set(CMAKE_C_STANDARD 23)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(GTK4 REQUIRED gtk4)

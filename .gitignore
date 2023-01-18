@@ -1,2 +1,7 @@
-# Project exclude paths
 /cmake-build-debug/
+*.kate-swp
+CMakeCache.txt
+Watch_Extractor
+Makefile
+compile_commands.json
+cmake_install.cmake
