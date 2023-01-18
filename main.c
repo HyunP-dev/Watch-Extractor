@@ -103,7 +103,7 @@ main(int argc,
 //    printf("%s", out2);
     g_autoptr (AdwApplication) app = NULL;
 
-    app = adw_application_new("org.example.Hello", G_APPLICATION_FLAGS_NONE);
+    app = adw_application_new("kr.ac.hallym.watchextractor", G_APPLICATION_DEFAULT_FLAGS);
 
     g_signal_connect (app, "activate", G_CALLBACK(activate_cb), NULL);
 
